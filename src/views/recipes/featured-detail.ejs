@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Recipe Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header') %>
+
+    <main class="container">
+        <div class="recipe-detail">
+            <div class="recipe-header">
+                <h1><%= recipe.title %></h1>
+                <span class="badge badge-featured">⭐ Featured Recipe</span>
+                <p class="recipe-author">
+                    Created by: <strong><%= recipe.first_name %> <%= recipe.last_name %></strong><br>
+                    <small>Featured on <%= new Date(recipe.featured_at).toLocaleDateString() %></small>
+                </p>
+            </div>
+
+            <% if (recipe.image_url) { %>
+                <div class="recipe-image-container">
+                    <img src="<%= recipe.image_url %>" alt="<%= recipe.title %>" class="recipe-detail-image">
+                </div>
+            <% } %>
+
+            <div class="recipe-info-grid">
+                <% if (recipe.prep_time) { %>
+                    <div class="info-item">
+                        <span class="label">Prep Time:</span>
+                        <span class="value"><%= recipe.prep_time %> minutes</span>
+                    </div>
+                <% } %>
+                <% if (recipe.cook_time) { %>
+                    <div class="info-item">
+                        <span class="label">Cook Time:</span>
+                        <span class="value"><%= recipe.cook_time %> minutes</span>
+                    </div>
+                <% } %>
+                <% if (recipe.servings) { %>
+                    <div class="info-item">
+                        <span class="label">Servings:</span>
+                        <span class="value"><%= recipe.servings %></span>
+                    </div>
+                <% } %>
+                <% if (recipe.difficulty) { %>
+                    <div class="info-item">
+                        <span class="label">Difficulty:</span>
+                        <span class="value"><%= recipe.difficulty.charAt(0).toUpperCase() + recipe.difficulty.slice(1) %></span>
+                    </div>
+                <% } %>
+            </div>
+
+            <% if (recipe.categories && recipe.categories.length > 0) { %>
+                <div class="recipe-categories">
+                    <strong>Categories:</strong>
+                    <% recipe.categories.forEach(category => { %>
+                        <span class="category-tag"><%= category.category_name %></span>
+                    <% }) %>
+                </div>
+            <% } %>
+
+            <% if (recipe.description) { %>
+                <section class="recipe-section">
+                    <h2>Description</h2>
+                    <p><%= recipe.description %></p>
+                </section>
+            <% } %>
+
+            <section class="recipe-section">
+                <h2>Ingredients</h2>
+                <% if (recipe.ingredients && recipe.ingredients.length > 0) { %>
+                    <ul class="ingredients-list">
+                        <% recipe.ingredients.forEach(ingredient => { %>
+                            <li>
+                                <span class="quantity"><%= ingredient.quantity %></span>
+                                <span class="name"><%= ingredient.ingredient_name %></span>
+                            </li>
+                        <% }) %>
+                    </ul>
+                <% } else { %>
+                    <p class="text-muted">No ingredients listed</p>
+                <% } %>
+            </section>
+
+            <section class="recipe-section">
+                <h2>Instructions</h2>
+                <div class="instructions">
+                    <%= recipe.instructions %>
+                </div>
+            </section>
+
+            <div class="recipe-actions">
+                <a href="/featured" class="btn btn-secondary">← Back to Featured Recipes</a>
+                
+                <% if (isAuthenticated && !isOwner) { %>
+                    <form action="/featured/<%= recipe.recipe_id %>/copy" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-success">📋 Copy to My Recipes</button>
+                    </form>
+                <% } %>
+                
+                <% if (isOwner) { %>
+                    <span class="owner-indicator">👤 Your Recipe</span>
+                    <form action="/featured/<%= recipe.recipe_id %>/delete" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this featured recipe?');">
+                        <button type="submit" class="btn btn-danger">Delete Recipe</button>
+                    </form>
+                <% } %>
+                
+                <% if (isContributor && !isOwner) { %>
+                    <form action="/featured/<%= recipe.recipe_id %>/unfeature" method="POST" style="display: inline;" onsubmit="return confirm('Remove this recipe from featured list?');">
+                        <button type="submit" class="btn btn-warning">Remove Featured Status</button>
+                    </form>
+                    <form action="/featured/<%= recipe.recipe_id %>/delete" method="POST" style="display: inline;" onsubmit="return confirm('Delete this featured recipe permanently?');">
+                        <button type="submit" class="btn btn-danger">Delete Recipe</button>
+                    </form>
+                <% } %>
+            </div>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

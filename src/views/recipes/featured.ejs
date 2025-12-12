@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Recipe Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header') %>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>⭐ <%= title %></h1>
+            <p class="subtitle">Discover amazing recipes from our community</p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <form action="/featured" method="GET" class="search-form">
+                <input 
+                    type="text" 
+                    name="search" 
+                    placeholder="Search featured recipes..." 
+                    value="<%= searchTerm %>"
+                    class="search-input"
+                >
+                <button type="submit" class="btn btn-primary">Search</button>
+                <% if (searchTerm) { %>
+                    <a href="/featured" class="btn btn-secondary">Clear</a>
+                <% } %>
+            </form>
+        </div>
+
+        <% if (locals.flashMessage) { %>
+            <div class="alert alert-<%= flashMessage.type %>">
+                <%= flashMessage.message %>
+            </div>
+        <% } %>
+
+        <% if (recipes.length === 0) { %>
+            <div class="empty-state">
+                <% if (searchTerm) { %>
+                    <p>No recipes found matching "<%= searchTerm %>"</p>
+                    <p>Try a different search term or <a href="/featured">browse all recipes</a></p>
+                <% } else { %>
+                    <p>No featured recipes yet.</p>
+                    <p>Be the first to submit a recipe!</p>
+                    <% if (isAuthenticated) { %>
+                        <a href="/recipes/new" class="btn btn-primary">Create a Recipe</a>
+                    <% } else { %>
+                        <a href="/register" class="btn btn-primary">Sign Up to Share Recipes</a>
+                    <% } %>
+                <% } %>
+            </div>
+        <% } else { %>
+            <div class="recipes-count">
+                <p>Showing <%= recipes.length %> featured recipe<%= recipes.length !== 1 ? 's' : '' %></p>
+            </div>
+
+            <div class="recipes-grid">
+                <% recipes.forEach(recipe => { %>
+                    <div class="recipe-card">
+                        <% if (recipe.image_url) { %>
+                            <img src="<%= recipe.image_url %>" alt="<%= recipe.title %>" class="recipe-image">
+                        <% } else { %>
+                            <div class="recipe-image-placeholder">
+                                <span>No Image</span>
+                            </div>
+                        <% } %>
+                        
+                        <div class="recipe-card-content">
+                            <h3><%= recipe.title %></h3>
+                            
+                            <% if (recipe.description) { %>
+                                <p class="description"><%= recipe.description.substring(0, 120) %><% if (recipe.description.length > 120) { %>...<% } %></p>
+                            <% } %>
+                            
+                            <div class="recipe-meta">
+                                <% if (recipe.prep_time) { %>
+                                    <span>⏱️ <%= recipe.prep_time %>min</span>
+                                <% } %>
+                                <% if (recipe.cook_time) { %>
+                                    <span>🍳 <%= recipe.cook_time %>min</span>
+                                <% } %>
+                                <% if (recipe.servings) { %>
+                                    <span>🍽️ <%= recipe.servings %> servings</span>
+                                <% } %>
+                                <% if (recipe.difficulty) { %>
+                                    <span>📊 <%= recipe.difficulty.charAt(0).toUpperCase() + recipe.difficulty.slice(1) %></span>
+                                <% } %>
+                            </div>
+                            
+                            <p class="recipe-author">
+                                By <strong><%= recipe.first_name %> <%= recipe.last_name %></strong>
+                            </p>
+                            
+                            <div class="card-actions">
+                                <a href="/featured/<%= recipe.recipe_id %>" class="btn btn-primary">
+                                    View Recipe
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } %>
+    </main>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

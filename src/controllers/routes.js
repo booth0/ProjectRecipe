@@ -1,3 +1,4 @@
+// /src/controllers/routes.js (UPDATED for Branch 2)
 import { Router } from 'express';
 
 // Create a new router instance
@@ -24,6 +25,13 @@ import {
     approveSubmissionHandler,
     rejectSubmissionHandler
 } from './recipes/submissions.js';
+import {
+    featuredRecipesPage,
+    featuredRecipeDetailPage,
+    copyFeaturedRecipeHandler,
+    unfeatureRecipeHandler,
+    deleteFeaturedRecipeHandler
+} from './recipes/featured.js';
 
 // Import middleware
 import { requireAuth, requireAdmin, requireContributor, redirectIfAuthenticated } from '../middleware/auth.js';
@@ -39,7 +47,14 @@ router.get('/register', redirectIfAuthenticated, registerPage);
 router.post('/register', registerUser);
 router.post('/logout', logoutUser);
 
-// Recipe routes
+// Featured recipes (public access)
+router.get('/featured', featuredRecipesPage);
+router.get('/featured/:recipeId', featuredRecipeDetailPage);
+router.post('/featured/:recipeId/copy', requireAuth, copyFeaturedRecipeHandler);
+router.post('/featured/:recipeId/unfeature', requireContributor, unfeatureRecipeHandler);
+router.post('/featured/:recipeId/delete', requireAuth, deleteFeaturedRecipeHandler);
+
+// Recipe routes (user's personal recipes)
 router.get('/recipes', requireAuth, myRecipesPage);
 router.get('/recipes/new', requireAuth, newRecipePage);
 router.post('/recipes', requireAuth, createRecipeHandler);
@@ -48,7 +63,6 @@ router.get('/recipes/:recipeId/edit', requireAuth, editRecipePage);
 router.post('/recipes/:recipeId/edit', requireAuth, updateRecipeHandler);
 router.post('/recipes/:recipeId/delete', requireAuth, deleteRecipeHandler);
 router.post('/recipes/:recipeId/copy', requireAuth, copyRecipeHandler);
-
 
 // Submission routes
 router.post('/recipes/:recipeId/submit', requireAuth, submitRecipeHandler);
