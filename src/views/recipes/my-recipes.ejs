@@ -1,22 +1,84 @@
 <%- include('../partials/header') %>
-<main>
+<main class="recipes-page">
     <div class="recipes-header">
         <h1>My Recipes</h1>
         <a href="/recipes/new" class="btn btn-primary">Add New Recipe</a>
     </div>
     
+    <div class="search-bar">
+        <form action="/recipes" method="GET">
+            <input 
+                type="text" 
+                name="search" 
+                placeholder="Search your recipes..." 
+                value="<%= searchTerm %>"
+            >
+            <button type="submit" class="btn btn-secondary">Search</button>
+            <% if (searchTerm) { %>
+                <a href="/recipes" class="btn">Clear</a>
+            <% } %>
+        </form>
+    </div>
+    
     <% if (recipes.length === 0) { %>
         <div class="empty-state">
-            <h2>No Recipes Yet</h2>
-            <p>Start building your personal cookbook by adding your first recipe!</p>
-            <a href="/recipes/new" class="btn btn-primary">Create Your First Recipe</a>
+            <% if (searchTerm) { %>
+                <h2>No Recipes Found</h2>
+                <p>No recipes match "<%= searchTerm %>". Try a different search term.</p>
+                <a href="/recipes" class="btn btn-secondary">View All Recipes</a>
+            <% } else { %>
+                <h2>No Recipes Yet</h2>
+                <p>Start building your personal cookbook by adding your first recipe!</p>
+                <a href="/recipes/new" class="btn btn-primary">Create Your First Recipe</a>
+            <% } %>
         </div>
     <% } else { %>
+        <div class="recipes-count">
+            <p>
+                <%= recipes.length %> <%= recipes.length === 1 ? 'recipe' : 'recipes' %>
+                <% if (searchTerm) { %>
+                    matching "<%= searchTerm %>"
+                <% } %>
+            </p>
+        </div>
+        
         <div class="recipes-grid">
             <% recipes.forEach(recipe => { %>
                 <div class="recipe-card">
-                    <h3><a href="/recipes/<%= recipe.recipe_id %>"><%= recipe.title %></a></h3>
-                    <p><%= recipe.description %></p>
+                    <% if (recipe.image_url) { %>
+                        <img src="<%= recipe.image_url %>" alt="<%= recipe.title %>">
+                    <% } %>
+                    <div class="recipe-card-content">
+                        <h3><a href="/recipes/<%= recipe.recipe_id %>"><%= recipe.title %></a></h3>
+                        <% if (recipe.description) { %>
+                            <p class="recipe-description"><%= recipe.description %></p>
+                        <% } %>
+                        <div class="recipe-meta">
+                            <% if (recipe.prep_time || recipe.cook_time) { %>
+                                <span class="recipe-time">
+                                    ⏱️ 
+                                    <% if (recipe.prep_time && recipe.cook_time) { %>
+                                        <%= recipe.prep_time + recipe.cook_time %> min total
+                                    <% } else if (recipe.prep_time) { %>
+                                        <%= recipe.prep_time %> min prep
+                                    <% } else { %>
+                                        <%= recipe.cook_time %> min cook
+                                    <% } %>
+                                </span>
+                            <% } %>
+                            <% if (recipe.servings) { %>
+                                <span class="recipe-servings">🍽️ <%= recipe.servings %> servings</span>
+                            <% } %>
+                            <% if (recipe.difficulty) { %>
+                                <span class="recipe-difficulty <%= recipe.difficulty %>">
+                                    <%= recipe.difficulty.charAt(0).toUpperCase() + recipe.difficulty.slice(1) %>
+                                </span>
+                            <% } %>
+                        </div>
+                        <% if (recipe.original_recipe_id) { %>
+                            <p class="recipe-copied">📋 Copied from another recipe</p>
+                        <% } %>
+                    </div>
                 </div>
             <% }); %>
         </div>

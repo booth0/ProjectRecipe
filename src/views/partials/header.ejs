@@ -6,6 +6,7 @@
     <title><%= title %> | Recipe Manager</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/auth.css">
+    <link rel="stylesheet" href="/css/recipes.css">
     <% if (NODE_ENV.includes('dev')) { %>
         <script>
             // Get the current hostname and port from the browser
@@ -34,7 +35,6 @@
                 <% if (isAuthenticated) { %>
                     <li><a href="/recipes">My Recipes</a></li>
                     <li><a href="/shared">Shared With Me</a></li>
-                    <li><a href="/collections">Collections</a></li>
                     <% if (isContributor) { %>
                         <li><a href="/contributor">Contributor</a></li>
                     <% } %>

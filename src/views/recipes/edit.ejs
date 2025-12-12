@@ -1,0 +1,202 @@
+<%- include('../partials/header') %>
+<main class="recipe-form-page">
+    <div class="recipe-form-container">
+        <h1>Edit Recipe</h1>
+        
+        <% if (error) { %>
+            <div class="error-message">
+                <%= error %>
+            </div>
+        <% } %>
+        
+        <form action="/recipes/<%= recipe.recipe_id %>/edit" method="POST" class="recipe-form">
+            <!-- Basic Information -->
+            <section class="form-section">
+                <h2>Basic Information</h2>
+                
+                <div class="form-group">
+                    <label for="title">Recipe Title *</label>
+                    <input 
+                        type="text" 
+                        id="title" 
+                        name="title" 
+                        required
+                        value="<%= recipe.title %>"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea 
+                        id="description" 
+                        name="description"
+                        rows="3"
+                        placeholder="Brief description of your recipe (optional)"
+                    ><%= recipe.description || '' %></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="image_url">Image URL</label>
+                    <input 
+                        type="url" 
+                        id="image_url" 
+                        name="image_url"
+                        value="<%= recipe.image_url || '' %>"
+                        placeholder="https://example.com/image.jpg (optional)"
+                    >
+                </div>
+            </section>
+            
+            <!-- Recipe Details -->
+            <section class="form-section">
+                <h2>Recipe Details</h2>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="prep_time">Prep Time (minutes)</label>
+                        <input 
+                            type="number" 
+                            id="prep_time" 
+                            name="prep_time"
+                            min="0"
+                            value="<%= recipe.prep_time || '' %>"
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cook_time">Cook Time (minutes)</label>
+                        <input 
+                            type="number" 
+                            id="cook_time" 
+                            name="cook_time"
+                            min="0"
+                            value="<%= recipe.cook_time || '' %>"
+                        >
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="servings">Servings</label>
+                        <input 
+                            type="number" 
+                            id="servings" 
+                            name="servings"
+                            min="1"
+                            value="<%= recipe.servings || '' %>"
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="difficulty">Difficulty</label>
+                        <select id="difficulty" name="difficulty">
+                            <option value="">Select difficulty</option>
+                            <option value="easy" <%= recipe.difficulty === 'easy' ? 'selected' : '' %>>Easy</option>
+                            <option value="medium" <%= recipe.difficulty === 'medium' ? 'selected' : '' %>>Medium</option>
+                            <option value="hard" <%= recipe.difficulty === 'hard' ? 'selected' : '' %>>Hard</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Ingredients -->
+            <section class="form-section">
+                <h2>Ingredients</h2>
+                <div id="ingredients-list">
+                    <% if (recipe.ingredients && recipe.ingredients.length > 0) { %>
+                        <% recipe.ingredients.forEach(ingredient => { %>
+                            <div class="ingredient-row">
+                                <input 
+                                    type="text" 
+                                    name="ingredient_quantity" 
+                                    value="<%= ingredient.quantity %>"
+                                    class="ingredient-quantity"
+                                >
+                                <input 
+                                    type="text" 
+                                    name="ingredient_name" 
+                                    value="<%= ingredient.ingredient_name %>"
+                                    class="ingredient-name"
+                                >
+                                <button type="button" class="btn-remove-ingredient" onclick="removeIngredient(this)">Remove</button>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="ingredient-row">
+                            <input 
+                                type="text" 
+                                name="ingredient_quantity" 
+                                placeholder="2 cups"
+                                class="ingredient-quantity"
+                            >
+                            <input 
+                                type="text" 
+                                name="ingredient_name" 
+                                placeholder="all-purpose flour"
+                                class="ingredient-name"
+                            >
+                            <button type="button" class="btn-remove-ingredient" onclick="removeIngredient(this)">Remove</button>
+                        </div>
+                    <% } %>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="addIngredient()">Add Ingredient</button>
+            </section>
+            
+            <!-- Instructions -->
+            <section class="form-section">
+                <h2>Instructions *</h2>
+                <div class="form-group">
+                    <textarea 
+                        id="instructions" 
+                        name="instructions"
+                        rows="10"
+                        required
+                    ><%= recipe.instructions %></textarea>
+                    <small class="form-hint">Write step-by-step instructions for your recipe</small>
+                </div>
+            </section>
+            
+            <!-- Submit -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="/recipes/<%= recipe.recipe_id %>" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+</main>
+
+<script>
+function addIngredient() {
+    const ingredientsList = document.getElementById('ingredients-list');
+    const newIngredient = document.createElement('div');
+    newIngredient.className = 'ingredient-row';
+    newIngredient.innerHTML = `
+        <input 
+            type="text" 
+            name="ingredient_quantity" 
+            placeholder="1 cup"
+            class="ingredient-quantity"
+        >
+        <input 
+            type="text" 
+            name="ingredient_name" 
+            placeholder="sugar"
+            class="ingredient-name"
+        >
+        <button type="button" class="btn-remove-ingredient" onclick="removeIngredient(this)">Remove</button>
+    `;
+    ingredientsList.appendChild(newIngredient);
+}
+
+function removeIngredient(button) {
+    const ingredientsList = document.getElementById('ingredients-list');
+    // Only allow removal if there's more than one ingredient row
+    if (ingredientsList.children.length > 1) {
+        button.parentElement.remove();
+    } else {
+        alert('You must have at least one ingredient field.');
+    }
+}
+</script>
+
+<%- include('../partials/footer') %>
