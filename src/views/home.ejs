@@ -1,14 +1,43 @@
 <%- include('partials/header') %>
-<main>
-    <h1><%= title %></h1>
-    <nav>
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/about">About</a></li>
-            <li><a href="/products">Products</a></li>
-        </ul>
-    </nav>
-    <p>Welcome to the Home Page of my Express App! This is the main content of the home page.</p>
-    <img src="https://picsum.photos/600/400" alt="Random image">
+<main class="home-page">
+    <section class="hero">
+        <h1>Welcome to Recipe Manager</h1>
+        <p class="tagline">Your personal cookbook in the cloud</p>
+        <p>Store, organize, and share your favorite recipes with friends and family.</p>
+        
+        <% if (!isAuthenticated) { %>
+            <div class="cta-buttons">
+                <a href="/register" class="btn btn-primary">Get Started</a>
+                <a href="/login" class="btn btn-secondary">Login</a>
+            </div>
+        <% } else { %>
+            <div class="cta-buttons">
+                <a href="/recipes" class="btn btn-primary">View My Recipes</a>
+                <a href="/recipes/new" class="btn btn-secondary">Add New Recipe</a>
+            </div>
+        <% } %>
+    </section>
+
+    <section class="features">
+        <h2>Features</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>Personal Collection</h3>
+                <p>Create and store all your recipes in one secure place</p>
+            </div>
+            <div class="feature-card">
+                <h3>Easy Sharing</h3>
+                <p>Share recipes with friends while maintaining control</p>
+            </div>
+            <div class="feature-card">
+                <h3>Organize</h3>
+                <p>Use collections and tags to keep everything organized</p>
+            </div>
+            <div class="feature-card">
+                <h3>Search & Filter</h3>
+                <p>Quickly find recipes by name, category, or ingredients</p>
+            </div>
+        </div>
+    </section>
 </main>
 <%- include('partials/footer') %>

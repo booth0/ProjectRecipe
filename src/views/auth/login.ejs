@@ -1,0 +1,47 @@
+<%- include('../partials/header') %>
+<main class="auth-page">
+    <div class="auth-container">
+        <h1>Login to Recipe Manager</h1>
+        
+        <% if (error) { %>
+            <div class="error-message">
+                <%= error %>
+            </div>
+        <% } %>
+        
+        <form action="/login" method="POST" class="auth-form">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required 
+                    autofocus
+                    placeholder="your.email@example.com"
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required
+                    placeholder="Enter your password"
+                >
+            </div>
+            
+            <!-- Hidden field to preserve redirect URL -->
+            <input type="hidden" name="redirectUrl" value="<%= redirectUrl %>">
+            
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+        
+        <div class="auth-links">
+            <p>Don't have an account? <a href="/register">Register here</a></p>
+        </div>
+    </div>
+</main>
+<%- include('../partials/footer') %>
