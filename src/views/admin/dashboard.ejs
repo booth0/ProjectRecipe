@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Recipe Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header') %>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>🔐 <%= title %></h1>
+            <p class="subtitle">User Management</p>
+        </div>
+
+        <% if (locals.flashMessage) { %>
+            <div class="alert alert-<%= flashMessage.type %>">
+                <%= flashMessage.message %>
+            </div>
+        <% } %>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <form action="/admin" method="GET" class="search-form">
+                <input 
+                    type="email" 
+                    name="search" 
+                    placeholder="Search by email address..." 
+                    value="<%= searchEmail %>"
+                    class="search-input"
+                >
+                <button type="submit" class="btn btn-primary">Search</button>
+                <% if (searchEmail) { %>
+                    <a href="/admin" class="btn btn-secondary">Show All Users</a>
+                <% } %>
+            </form>
+        </div>
+
+        <% if (users.length === 0) { %>
+            <div class="empty-state">
+                <% if (searchEmail) { %>
+                    <p>No user found with email "<%= searchEmail %>"</p>
+                    <a href="/admin" class="btn btn-primary">Show All Users</a>
+                <% } else { %>
+                    <p>No users in the system yet.</p>
+                <% } %>
+            </div>
+        <% } else { %>
+            <div class="users-count">
+                <p>Showing <%= users.length %> user<%= users.length !== 1 ? 's' : '' %></p>
+            </div>
+
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Email</th>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% users.forEach(u => { %>
+                            <tr class="<%= u.user_id === user.user_id ? 'current-user' : '' %>">
+                                <td><%= u.user_id %></td>
+                                <td><%= u.email %></td>
+                                <td><%= u.first_name %> <%= u.last_name %></td>
+                                <td>
+                                    <span class="role-badge role-<%= u.role %>">
+                                        <%= u.role.toUpperCase() %>
+                                    </span>
+                                </td>
+                                <td><%= new Date(u.created_at).toLocaleDateString() %></td>
+                                <td>
+                                    <% if (u.user_id === user.user_id) { %>
+                                        <span class="text-muted">Current User</span>
+                                    <% } else { %>
+                                        <form action="/admin/users/<%= u.user_id %>/role" method="POST" class="role-form" onsubmit="return confirm('Change role for <%= u.email %>?');">
+                                            <select name="role" class="role-select">
+                                                <option value="user" <%= u.role === 'user' ? 'selected' : '' %>>User</option>
+                                                <option value="contributor" <%= u.role === 'contributor' ? 'selected' : '' %>>Contributor</option>
+                                                <option value="admin" <%= u.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                                        </form>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        <% } %>
+
+        <div class="admin-info">
+            <h3>User Role Definitions</h3>
+            <div class="role-definitions">
+                <div class="role-def">
+                    <strong>👤 User:</strong> Can create and manage personal recipes, submit recipes for review, copy featured recipes
+                </div>
+                <div class="role-def">
+                    <strong>📝 Contributor:</strong> All user permissions + can review submissions, approve/reject recipes, moderate featured content
+                </div>
+                <div class="role-def">
+                    <strong>🔐 Admin:</strong> All contributor permissions + can manage users, change roles, manage categories
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>
