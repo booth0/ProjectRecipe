@@ -8,6 +8,7 @@ import {
     copyRecipe,
     searchUserRecipes
 } from '../../models/recipes/recipes.js';
+import { isRecipeSubmitted, isRecipeFeatured } from '../../models/recipes/submissions.js';
 
 /**
  * Display user's recipes page (placeholder)
@@ -24,10 +25,15 @@ const myRecipesPage = async (req, res) => {
             recipes = await getRecipesByOwner(userId);
         }
         
+        // Get flash message if any
+        const flashMessage = req.session.flashMessage;
+        delete req.session.flashMessage;
+        
         res.render('recipes/my-recipes', {
             title: 'My Recipes',
             recipes,
-            searchTerm
+            searchTerm,
+            flashMessage
         });
     } catch (error) {
         console.error('Error loading recipes:', error);
@@ -140,10 +146,21 @@ const recipeDetailPage = async (req, res) => {
             });
         }
         
+        // Check submission and featured status
+        const isSubmitted = await isRecipeSubmitted(recipeId);
+        const isFeatured = await isRecipeFeatured(recipeId);
+        
+        // Get flash message if any
+        const flashMessage = req.session.flashMessage;
+        delete req.session.flashMessage;
+        
         res.render('recipes/detail', {
             title: recipe.title,
             recipe,
-            isOwner
+            isOwner,
+            isSubmitted,
+            isFeatured,
+            flashMessage
         });
     } catch (error) {
         console.error('Error loading recipe:', error);
@@ -180,6 +197,16 @@ const editRecipePage = async (req, res) => {
             });
         }
         
+        // Check if recipe is featured - featured recipes can't be edited
+        const isFeatured = await isRecipeFeatured(recipeId);
+        if (isFeatured) {
+            return res.status(403).render('errors/500', {
+                title: 'Cannot Edit Featured Recipe',
+                error: 'Featured recipes cannot be edited. Please delete and resubmit if you need to make changes.',
+                stack: ''
+            });
+        }
+        
         res.render('recipes/edit', {
             title: `Edit ${recipe.title}`,
             recipe,
@@ -210,6 +237,16 @@ const updateRecipeHandler = async (req, res) => {
             return res.status(403).render('errors/500', {
                 title: 'Access Denied',
                 error: 'You can only edit your own recipes',
+                stack: ''
+            });
+        }
+        
+        // Check if recipe is featured
+        const isFeatured = await isRecipeFeatured(recipeId);
+        if (isFeatured) {
+            return res.status(403).render('errors/500', {
+                title: 'Cannot Edit Featured Recipe',
+                error: 'Featured recipes cannot be edited',
                 stack: ''
             });
         }
@@ -300,7 +337,7 @@ const copyRecipeHandler = async (req, res) => {
         const recipeId = req.params.recipeId;
         const userId = req.session.user.user_id;
         
-        // TODO: Check if recipe is shared with user
+        // TODO: Check if recipe is shared with user or featured
         
         const newRecipe = await copyRecipe(recipeId, userId);
         

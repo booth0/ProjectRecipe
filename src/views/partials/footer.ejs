@@ -1,7 +1,42 @@
-<footer>
-        <div class="footer-content">
-            <p>&copy; <%= currentYear %> Recipe Manager. Store, organize, and share your favorite recipes.</p>
+<footer class="site-footer">
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3>Recipe Manager</h3>
+            <p>Share and discover amazing recipes from our community.</p>
         </div>
-    </footer>
-</body>
-</html>
+        
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/featured">Featured Recipes</a></li>
+                <li><a href="/about">About</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Account</h4>
+            <ul>
+                <% if (isAuthenticated) { %>
+                    <li><a href="/recipes">My Recipes</a></li>
+                    <li><a href="/recipes/new">Create Recipe</a></li>
+                <% } else { %>
+                    <li><a href="/login">Login</a></li>
+                    <li><a href="/register">Sign Up</a></li>
+                <% } %>
+            </ul>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; <%= currentYear %> Recipe Manager. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<% if (NODE_ENV.includes('dev')) { %>
+    <script>
+        // Live reload for development
+        const ws = new WebSocket('ws://localhost:<%= parseInt(process.env.PORT || 3000) + 1 %>');
+        ws.onmessage = () => location.reload();
+    </script>
+<% } %>

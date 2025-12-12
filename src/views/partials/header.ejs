@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/auth.css">
     <link rel="stylesheet" href="/css/recipes.css">
+    <link rel="stylesheet" href="/css/style.css">
     <% if (NODE_ENV.includes('dev')) { %>
         <script>
             // Get the current hostname and port from the browser
@@ -25,35 +26,42 @@
     <% } %>
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="nav-brand">
-                <a href="/">Recipe Manager</a>
-            </div>
-            <ul class="nav-links">
+    <header class="site-header">
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <span class="logo-icon">🍳</span>
+                <span class="logo-text">Recipe Manager</span>
+            </a>
+            
+            <ul class="nav-menu">
                 <li><a href="/">Home</a></li>
+                <li><a href="/featured">Featured Recipes</a></li>
+                
                 <% if (isAuthenticated) { %>
                     <li><a href="/recipes">My Recipes</a></li>
-                    <li><a href="/shared">Shared With Me</a></li>
+                    
                     <% if (isContributor) { %>
-                        <li><a href="/contributor">Contributor</a></li>
+                        <li><a href="/contributor/submissions">Review Submissions</a></li>
                     <% } %>
+                    
                     <% if (isAdmin) { %>
                         <li><a href="/admin">Admin</a></li>
                     <% } %>
-                <% } %>
-                <li><a href="/about">About</a></li>
-            </ul>
-            <div class="nav-auth">
-                <% if (isAuthenticated) { %>
-                    <span class="user-greeting">Hello, <%= user.firstName %>!</span>
-                    <form action="/logout" method="POST" style="display: inline;">
-                        <button type="submit" class="btn-logout">Logout</button>
-                    </form>
+                    
+                    <li class="user-menu">
+                        <span class="user-greeting">
+                            Hello, <%= user.firstName %>!
+                        </span>
+                        <form action="/logout" method="POST" style="display: inline;">
+                            <button type="submit" class="btn-link">Logout</button>
+                        </form>
+                    </li>
                 <% } else { %>
-                    <a href="/login" class="btn-login">Login</a>
-                    <a href="/register" class="btn-register">Register</a>
+                    <li><a href="/login">Login</a></li>
+                    <li><a href="/register" class="btn btn-primary">Sign Up</a></li>
                 <% } %>
-            </div>
-        </nav>
-    </header>
+            </ul>
+        </div>
+    </nav>
+</header>

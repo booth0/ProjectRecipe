@@ -1,0 +1,80 @@
+<!-- /src/views/contributor/submissions.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Recipe Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header') %>
+
+    <main class="container">
+        <div class="page-header">
+            <h1><%= title %></h1>
+            <p class="subtitle">Review submitted recipes for featuring</p>
+        </div>
+
+        <% if (locals.flashMessage) { %>
+            <div class="alert alert-<%= flashMessage.type %>">
+                <%= flashMessage.message %>
+            </div>
+        <% } %>
+
+        <% if (submissions.length === 0) { %>
+            <div class="empty-state">
+                <p>No pending submissions at this time.</p>
+                <p>Check back later for new recipe submissions to review.</p>
+            </div>
+        <% } else { %>
+            <div class="submissions-grid">
+                <% submissions.forEach(submission => { %>
+                    <div class="recipe-card">
+                        <% if (submission.image_url) { %>
+                            <img src="<%= submission.image_url %>" alt="<%= submission.title %>" class="recipe-image">
+                        <% } else { %>
+                            <div class="recipe-image-placeholder">
+                                <span>No Image</span>
+                            </div>
+                        <% } %>
+                        
+                        <div class="recipe-card-content">
+                            <h3><%= submission.title %></h3>
+                            
+                            <% if (submission.description) { %>
+                                <p class="description"><%= submission.description.substring(0, 100) %><% if (submission.description.length > 100) { %>...<% } %></p>
+                            <% } %>
+                            
+                            <div class="recipe-meta">
+                                <% if (submission.prep_time) { %>
+                                    <span>⏱️ Prep: <%= submission.prep_time %>min</span>
+                                <% } %>
+                                <% if (submission.cook_time) { %>
+                                    <span>🍳 Cook: <%= submission.cook_time %>min</span>
+                                <% } %>
+                                <% if (submission.difficulty) { %>
+                                    <span>📊 <%= submission.difficulty.charAt(0).toUpperCase() + submission.difficulty.slice(1) %></span>
+                                <% } %>
+                            </div>
+                            
+                            <p class="submitted-by">
+                                Submitted by: <strong><%= submission.first_name %> <%= submission.last_name %></strong><br>
+                                <small>on <%= new Date(submission.submitted_at).toLocaleDateString() %></small>
+                            </p>
+                            
+                            <div class="card-actions">
+                                <a href="/contributor/submissions/<%= submission.submission_id %>" class="btn btn-primary">
+                                    Review Recipe
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } %>
+    </main>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

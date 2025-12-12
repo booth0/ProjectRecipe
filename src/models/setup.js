@@ -1,3 +1,4 @@
+// /src/models/setup.js (COMPLETE FILE - Branch 1)
 import db from './db.js';
 
 /**
@@ -17,6 +18,7 @@ const createUsersTableIfNotExists = `
 
 /**
  * SQL to create the recipes table if it doesn't exist
+ * MODIFIED: Added is_featured and featured_at columns
  */
 const createRecipesTableIfNotExists = `
     CREATE TABLE IF NOT EXISTS recipes (
@@ -31,6 +33,8 @@ const createRecipesTableIfNotExists = `
         image_url VARCHAR(500),
         owner_id INTEGER NOT NULL,
         original_recipe_id INTEGER,
+        is_featured BOOLEAN DEFAULT false,
+        featured_at TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (owner_id) REFERENCES users(user_id) ON DELETE CASCADE,
@@ -103,7 +107,7 @@ const createRecipeSubmissionsTableIfNotExists = `
         submission_id SERIAL PRIMARY KEY,
         recipe_id INTEGER NOT NULL,
         submitted_by INTEGER NOT NULL,
-        status VARCHAR(20) NOT NULL CHECK (status IN ('pending', 'approved', 'rejected', 'featured')),
+        status VARCHAR(20) NOT NULL CHECK (status IN ('pending', 'under_review', 'approved', 'rejected')),
         reviewed_by INTEGER,
         submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         reviewed_at TIMESTAMP,

@@ -1,6 +1,8 @@
+// /src/middleware/global.js (COMPLETE FILE - Branch 1)
 /**
  * Middleware to add important local variables to res.locals for all templates.
  * These variables will be available in all EJS templates.
+ * MODIFIED: Added middleware to handle flash messages
  */
 const addImportantLocalVariables = (req, res, next) => {
     // Set current year for use in templates (e.g., copyright footer)

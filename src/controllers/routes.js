@@ -7,7 +7,23 @@ const router = Router();
 import { homePage, aboutPage, testErrorPage } from './index.js';
 import { notFoundHandler, globalErrorHandler } from './errors.js';
 import { loginPage, loginUser, registerPage, registerUser, logoutUser } from './auth/auth.js';
-import { myRecipesPage, newRecipePage, createRecipeHandler, recipeDetailPage, editRecipePage, updateRecipeHandler, deleteRecipeHandler, copyRecipeHandler } from './recipes/recipes.js';
+import { 
+    myRecipesPage, 
+    newRecipePage, 
+    createRecipeHandler, 
+    recipeDetailPage, 
+    editRecipePage, 
+    updateRecipeHandler, 
+    deleteRecipeHandler, 
+    copyRecipeHandler 
+} from './recipes/recipes.js';
+import {
+    submitRecipeHandler,
+    submissionsPage,
+    reviewSubmissionPage,
+    approveSubmissionHandler,
+    rejectSubmissionHandler
+} from './recipes/submissions.js';
 
 // Import middleware
 import { requireAuth, requireAdmin, requireContributor, redirectIfAuthenticated } from '../middleware/auth.js';
@@ -33,17 +49,20 @@ router.post('/recipes/:recipeId/edit', requireAuth, updateRecipeHandler);
 router.post('/recipes/:recipeId/delete', requireAuth, deleteRecipeHandler);
 router.post('/recipes/:recipeId/copy', requireAuth, copyRecipeHandler);
 
+
+// Submission routes
+router.post('/recipes/:recipeId/submit', requireAuth, submitRecipeHandler);
+
+// Contributor routes
+router.get('/contributor/submissions', requireContributor, submissionsPage);
+router.get('/contributor/submissions/:submissionId', requireContributor, reviewSubmissionPage);
+router.post('/contributor/submissions/:submissionId/approve', requireContributor, approveSubmissionHandler);
+router.post('/contributor/submissions/:submissionId/reject', requireContributor, rejectSubmissionHandler);
+
 // Sharing routes (to be implemented)
 // router.get('/shared', requireAuth, sharedWithMePage);
 // router.post('/recipes/:recipeId/share', requireAuth, shareRecipe);
 // router.post('/shares/:shareId/remove', requireAuth, removeShare);
-
-// Contributor routes (to be implemented)
-// router.get('/contributor', requireContributor, contributorDashboard);
-// router.get('/contributor/submissions', requireContributor, reviewSubmissionsPage);
-// router.post('/contributor/submissions/:submissionId/approve', requireContributor, approveSubmission);
-// router.post('/contributor/submissions/:submissionId/reject', requireContributor, rejectSubmission);
-// router.post('/contributor/submissions/:submissionId/feature', requireContributor, featureSubmission);
 
 // Admin routes (to be implemented)
 // router.get('/admin', requireAdmin, adminDashboard);
