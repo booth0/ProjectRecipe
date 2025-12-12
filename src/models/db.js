@@ -36,7 +36,8 @@ const pool = new Pool({
  */
 let db = null;
 
-if (process.env.NODE_ENV.includes('dev') && process.env.ENABLE_SQL_LOGGING === 'true') {
+if (process.env.NODE_ENV?.includes('dev') && process.env.ENABLE_SQL_LOGGING === 'true') {
+    // ↑ Add the question mark here
     /**
      * In development mode, we wrap the pool to provide query logging.
      * This helps with debugging by showing all executed queries in the console.
@@ -45,30 +46,32 @@ if (process.env.NODE_ENV.includes('dev') && process.env.ENABLE_SQL_LOGGING === '
      * and tracks the number of rows affected by each query.
      */
     db = {
-        async query(text, params) {
-            try {
-                const start = Date.now();
-                const res = await pool.query(text, params);
-                const duration = Date.now() - start;
-                console.log('Executed query:', { 
-                    text: text.replace(/\s+/g, ' ').trim(), 
-                    duration: `${duration}ms`, 
-                    rows: res.rowCount 
-                });
-                return res;
-            } catch (error) {
-                console.error('Error in query:', { 
-                    text: text.replace(/\s+/g, ' ').trim(), 
-                    error: error.message 
-                });
-                throw error;
-            }
-        },
-
-        async close() {
-            await pool.end();
+    async query(text, params) {
+        try {
+            const start = Date.now();
+            const res = await pool.query(text, params);
+            const duration = Date.now() - start;
+            console.log('Executed query:', { 
+                text: text.replace(/\s+/g, ' ').trim(), 
+                duration: `${duration}ms`, 
+                rows: res.rowCount 
+            });
+            return res;
+        } catch (error) {
+            console.error('Error in query:', { 
+                text: text.replace(/\s+/g, ' ').trim(), 
+                error: error.message 
+            });
+            throw error;
         }
-    };
+    },
+
+    connect: (...args) => pool.connect(...args),  // ✔ ADDED
+
+    close: async () => {
+        await pool.end();
+    }
+};
 } else {
     // In production, export the pool directly without logging overhead
     db = pool;

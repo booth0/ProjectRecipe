@@ -95,61 +95,6 @@ const createIngredientsTableIfNotExists = `
 `;
 
 /**
- * SQL to create the collections table if it doesn't exist
- */
-const createCollectionsTableIfNotExists = `
-    CREATE TABLE IF NOT EXISTS collections (
-        collection_id SERIAL PRIMARY KEY,
-        user_id INTEGER NOT NULL,
-        collection_name VARCHAR(150) NOT NULL,
-        description TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-    )
-`;
-
-/**
- * SQL to create the recipe_collections junction table if it doesn't exist
- */
-const createRecipeCollectionsTableIfNotExists = `
-    CREATE TABLE IF NOT EXISTS recipe_collections (
-        recipe_id INTEGER NOT NULL,
-        collection_id INTEGER NOT NULL,
-        added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (recipe_id, collection_id),
-        FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id) ON DELETE CASCADE,
-        FOREIGN KEY (collection_id) REFERENCES collections(collection_id) ON DELETE CASCADE
-    )
-`;
-
-/**
- * SQL to create the tags table if it doesn't exist
- */
-const createTagsTableIfNotExists = `
-    CREATE TABLE IF NOT EXISTS tags (
-        tag_id SERIAL PRIMARY KEY,
-        user_id INTEGER NOT NULL,
-        tag_name VARCHAR(100) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-        UNIQUE (user_id, tag_name)
-    )
-`;
-
-/**
- * SQL to create the recipe_tags junction table if it doesn't exist
- */
-const createRecipeTagsTableIfNotExists = `
-    CREATE TABLE IF NOT EXISTS recipe_tags (
-        recipe_id INTEGER NOT NULL,
-        tag_id INTEGER NOT NULL,
-        PRIMARY KEY (recipe_id, tag_id),
-        FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id) ON DELETE CASCADE,
-        FOREIGN KEY (tag_id) REFERENCES tags(tag_id) ON DELETE CASCADE
-    )
-`;
-
-/**
  * SQL to create the recipe_submissions table if it doesn't exist
  * This tracks the multi-stage workflow for featuring recipes
  */
@@ -215,10 +160,6 @@ const allTablesExist = async () => {
         'categories',
         'recipe_categories',
         'ingredients',
-        'collections',
-        'recipe_collections',
-        'tags',
-        'recipe_tags',
         'recipe_submissions'
     ];
 
@@ -269,10 +210,6 @@ const setupDatabase = async () => {
         await db.query(createCategoriesTableIfNotExists);
         await db.query(createRecipeCategoriesTableIfNotExists);
         await db.query(createIngredientsTableIfNotExists);
-        await db.query(createCollectionsTableIfNotExists);
-        await db.query(createRecipeCollectionsTableIfNotExists);
-        await db.query(createTagsTableIfNotExists);
-        await db.query(createRecipeTagsTableIfNotExists);
         await db.query(createRecipeSubmissionsTableIfNotExists);
 
         // Insert initial category data
