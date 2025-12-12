@@ -9,9 +9,10 @@ import {
     searchUserRecipes
 } from '../../models/recipes/recipes.js';
 import { isRecipeSubmitted, isRecipeFeatured } from '../../models/recipes/submissions.js';
+import { getAllCategories, setRecipeCategories } from '../../models/recipes/categories.js';
 
 /**
- * Display user's recipes page (placeholder)
+ * Display user's recipes page
  */
 const myRecipesPage = async (req, res) => {
     try {
@@ -48,12 +49,24 @@ const myRecipesPage = async (req, res) => {
 /**
  * Display create recipe page
  */
-const newRecipePage = (req, res) => {
-    res.render('recipes/new', {
-        title: 'Create New Recipe',
-        error: null,
-        formData: {}
-    });
+const newRecipePage = async (req, res) => {
+    try {
+        const categories = await getAllCategories();
+        
+        res.render('recipes/new', {
+            title: 'Create New Recipe',
+            error: null,
+            formData: {},
+            categories
+        });
+    } catch (error) {
+        console.error('Error loading new recipe page:', error);
+        res.status(500).render('errors/500', {
+            title: 'Error',
+            error: 'Failed to load page',
+            stack: error.stack
+        });
+    }
 };
 
 /**
@@ -62,14 +75,18 @@ const newRecipePage = (req, res) => {
 const createRecipeHandler = async (req, res) => {
     try {
         const userId = req.session.user.user_id;
-        const { title, description, instructions, prep_time, cook_time, servings, difficulty, image_url } = req.body;
+        const { title, description, instructions, prep_time, cook_time, servings, difficulty, image_url, categories: categoryIds } = req.body;
+        
+        // Get all categories for re-rendering form on error
+        const allCategories = await getAllCategories();
         
         // Validate required fields
         if (!title || !instructions) {
             return res.render('recipes/new', {
                 title: 'Create New Recipe',
                 error: 'Title and instructions are required',
-                formData: req.body
+                formData: req.body,
+                categories: allCategories
             });
         }
         
@@ -107,13 +124,21 @@ const createRecipeHandler = async (req, res) => {
         
         const recipe = await createRecipe(recipeData, ingredients);
         
+        // Set categories if any were selected
+        if (categoryIds) {
+            const categoryIdArray = Array.isArray(categoryIds) ? categoryIds.map(id => parseInt(id)) : [parseInt(categoryIds)];
+            await setRecipeCategories(recipe.recipe_id, categoryIdArray);
+        }
+        
         res.redirect(`/recipes/${recipe.recipe_id}`);
     } catch (error) {
         console.error('Error creating recipe:', error);
+        const allCategories = await getAllCategories();
         res.render('recipes/new', {
             title: 'Create New Recipe',
             error: 'Failed to create recipe. Please try again.',
-            formData: req.body
+            formData: req.body,
+            categories: allCategories
         });
     }
 };
@@ -181,6 +206,7 @@ const editRecipePage = async (req, res) => {
         const userId = req.session.user.user_id;
         
         const recipe = await getRecipeById(recipeId);
+        const allCategories = await getAllCategories();
         
         if (!recipe) {
             return res.status(404).render('errors/404', {
@@ -210,7 +236,8 @@ const editRecipePage = async (req, res) => {
         res.render('recipes/edit', {
             title: `Edit ${recipe.title}`,
             recipe,
-            error: null
+            error: null,
+            categories: allCategories
         });
     } catch (error) {
         console.error('Error loading recipe for edit:', error);
@@ -229,7 +256,7 @@ const updateRecipeHandler = async (req, res) => {
     try {
         const recipeId = req.params.recipeId;
         const userId = req.session.user.user_id;
-        const { title, description, instructions, prep_time, cook_time, servings, difficulty, image_url } = req.body;
+        const { title, description, instructions, prep_time, cook_time, servings, difficulty, image_url, categories: categoryIds } = req.body;
         
         // Check ownership
         const isOwner = await userOwnsRecipe(userId, recipeId);
@@ -254,10 +281,12 @@ const updateRecipeHandler = async (req, res) => {
         // Validate required fields
         if (!title || !instructions) {
             const recipe = await getRecipeById(recipeId);
+            const allCategories = await getAllCategories();
             return res.render('recipes/edit', {
                 title: `Edit ${recipe.title}`,
                 recipe,
-                error: 'Title and instructions are required'
+                error: 'Title and instructions are required',
+                categories: allCategories
             });
         }
         
@@ -294,14 +323,25 @@ const updateRecipeHandler = async (req, res) => {
         
         await updateRecipe(recipeId, recipeData, ingredients);
         
+        // Update categories
+        if (categoryIds) {
+            const categoryIdArray = Array.isArray(categoryIds) ? categoryIds.map(id => parseInt(id)) : [parseInt(categoryIds)];
+            await setRecipeCategories(recipeId, categoryIdArray);
+        } else {
+            // No categories selected, remove all
+            await setRecipeCategories(recipeId, []);
+        }
+        
         res.redirect(`/recipes/${recipeId}`);
     } catch (error) {
         console.error('Error updating recipe:', error);
         const recipe = await getRecipeById(req.params.recipeId);
+        const allCategories = await getAllCategories();
         res.render('recipes/edit', {
             title: `Edit ${recipe.title}`,
             recipe,
-            error: 'Failed to update recipe. Please try again.'
+            error: 'Failed to update recipe. Please try again.',
+            categories: allCategories
         });
     }
 };

@@ -1,0 +1,151 @@
+    <%- include('../partials/header') %>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>🏷️ <%= title %></h1>
+            <p class="subtitle">Organize recipes by category</p>
+        </div>
+
+        <% if (locals.flashMessage) { %>
+            <div class="alert alert-<%= flashMessage.type %>">
+                <%= flashMessage.message %>
+            </div>
+        <% } %>
+
+        <!-- Create Category Form -->
+        <div class="form-section">
+            <h2>Create New Category</h2>
+            <form action="/admin/categories" method="POST" class="category-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="category_name">Category Name *</label>
+                        <input 
+                            type="text" 
+                            id="category_name" 
+                            name="category_name" 
+                            required 
+                            placeholder="e.g., Breakfast"
+                            class="form-input"
+                        >
+                    </div>
+                    <div class="form-group form-group-wide">
+                        <label for="description">Description (Optional)</label>
+                        <input 
+                            type="text" 
+                            id="description" 
+                            name="description" 
+                            placeholder="e.g., Morning meals and brunch recipes"
+                            class="form-input"
+                        >
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">Create Category</button>
+            </form>
+        </div>
+
+        <!-- Categories List -->
+        <div class="categories-section">
+            <h2>Existing Categories (<%= categories.length %>)</h2>
+            
+            <% if (categories.length === 0) { %>
+                <div class="empty-state">
+                    <p>No categories yet. Create one above!</p>
+                </div>
+            <% } else { %>
+                <div class="categories-list">
+                    <% categories.forEach(category => { %>
+                        <div class="category-item">
+                            <div class="category-header">
+                                <div class="category-info">
+                                    <h3><%= category.category_name %></h3>
+                                    <p class="category-description"><%= category.description || 'No description' %></p>
+                                    <p class="category-meta">
+                                        <span class="recipe-count"><%= category.recipe_count %> recipe<%= category.recipe_count !== 1 ? 's' : '' %></span>
+                                        <span class="created-date">Created <%= new Date(category.created_at).toLocaleDateString() %></span>
+                                    </p>
+                                </div>
+                                <div class="category-actions">
+                                    <button 
+                                        type="button"
+                                        class="btn btn-sm btn-primary" 
+                                        onclick="toggleEditForm('<%= category.category_id %>')"
+                                    >
+                                        Edit
+                                    </button>
+                                    <form 
+                                        action="/admin/categories/<%= category.category_id %>/delete" 
+                                        method="POST" 
+                                        style="display: inline;"
+                                        onsubmit="return confirm('Delete category &quot;<%= category.category_name %>&quot;? This will remove it from all recipes.');"
+                                    >
+                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <!-- Edit Form (Hidden by default) -->
+                            <div id="edit-form-<%= category.category_id %>" class="edit-form" style="display: none;">
+                                <form action="/admin/categories/<%= category.category_id %>/edit" method="POST">
+                                    <div class="form-group">
+                                        <label for="edit_name_<%= category.category_id %>">Category Name</label>
+                                        <input 
+                                            type="text" 
+                                            id="edit_name_<%= category.category_id %>" 
+                                            name="category_name" 
+                                            value="<%= category.category_name %>"
+                                            required
+                                            class="form-input"
+                                        >
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="edit_desc_<%= category.category_id %>">Description</label>
+                                        <input 
+                                            type="text" 
+                                            id="edit_desc_<%= category.category_id %>" 
+                                            name="description" 
+                                            value="<%= category.description || '' %>"
+                                            class="form-input"
+                                        >
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn-sm btn-success">Save Changes</button>
+                                        <button 
+                                            type="button" 
+                                            class="btn btn-sm btn-secondary" 
+                                            onclick="toggleEditForm('<%= category.category_id %>')"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } %>
+        </div>
+
+        <div class="admin-info">
+            <h3>About Categories</h3>
+            <p>Categories help organize recipes and make them easier to discover. Users can assign categories when creating or editing recipes. Featured recipes will display their categories publicly.</p>
+            <ul>
+                <li>Categories are created and managed by admins only</li>
+                <li>Users can select from existing categories when creating recipes</li>
+                <li>Deleting a category removes it from all recipes (but doesn't delete the recipes)</li>
+                <li>Initial categories are created automatically when setting up the database</li>
+            </ul>
+        </div>
+    </main>
+
+    <script>
+        function toggleEditForm(categoryId) {
+            const form = document.getElementById('edit-form-' + categoryId);
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+    </script>
+
+    <%- include('../partials/footer') %>

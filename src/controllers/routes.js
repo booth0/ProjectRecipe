@@ -35,6 +35,12 @@ import {
     adminDashboardPage,
     updateUserRoleHandler
 } from './admin/admin.js';
+import {
+    manageCategoriesPage,
+    createCategoryHandler,
+    updateCategoryHandler,
+    deleteCategoryHandler
+} from './admin/categories.js';
 
 // Import middleware
 import { requireAuth, requireAdmin, requireContributor, redirectIfAuthenticated } from '../middleware/auth.js';
@@ -80,16 +86,16 @@ router.post('/contributor/submissions/:submissionId/reject', requireContributor,
 router.get('/admin', requireAdmin, adminDashboardPage);
 router.post('/admin/users/:userId/role', requireAdmin, updateUserRoleHandler);
 
+// Admin category management
+router.get('/admin/categories', requireAdmin, manageCategoriesPage);
+router.post('/admin/categories', requireAdmin, createCategoryHandler);
+router.post('/admin/categories/:categoryId/edit', requireAdmin, updateCategoryHandler);
+router.post('/admin/categories/:categoryId/delete', requireAdmin, deleteCategoryHandler);
+
 // Sharing routes (to be implemented)
 // router.get('/shared', requireAuth, sharedWithMePage);
 // router.post('/recipes/:recipeId/share', requireAuth, shareRecipe);
 // router.post('/shares/:shareId/remove', requireAuth, removeShare);
-
-// Admin category management (to be implemented)
-// router.get('/admin/categories', requireAdmin, manageCategoriesPage);
-// router.post('/admin/categories', requireAdmin, createCategory);
-// router.post('/admin/categories/:categoryId/edit', requireAdmin, updateCategory);
-// router.post('/admin/categories/:categoryId/delete', requireAdmin, deleteCategory);
 
 // Route to trigger a test error
 router.get('/test-error', testErrorPage);

@@ -1,182 +1,219 @@
-<%- include('../partials/header') %>
-<main class="recipe-form-page">
-    <div class="recipe-form-container">
-        <h1>Create New Recipe</h1>
-        
+<!-- /src/views/recipes/new.ejs (UPDATED for Branch 4) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Recipe Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header') %>
+
+    <main class="container">
+        <div class="page-header">
+            <h1><%= title %></h1>
+        </div>
+
         <% if (error) { %>
-            <div class="error-message">
+            <div class="alert alert-error">
                 <%= error %>
             </div>
         <% } %>
-        
-        <form action="/recipes" method="POST" class="recipe-form">
-            <!-- Basic Information -->
-            <section class="form-section">
-                <h2>Basic Information</h2>
-                
-                <div class="form-group">
-                    <label for="title">Recipe Title *</label>
-                    <input 
-                        type="text" 
-                        id="title" 
-                        name="title" 
-                        required
-                        value="<%= formData.title || '' %>"
-                        placeholder="e.g., Grandma's Chocolate Chip Cookies"
-                    >
-                </div>
-                
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea 
-                        id="description" 
-                        name="description"
-                        rows="3"
-                        placeholder="Brief description of your recipe (optional)"
-                    ><%= formData.description || '' %></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="image_url">Image URL</label>
-                    <input 
-                        type="url" 
-                        id="image_url" 
-                        name="image_url"
-                        value="<%= formData.image_url || '' %>"
-                        placeholder="https://example.com/image.jpg (optional)"
-                    >
-                </div>
-            </section>
-            
-            <!-- Recipe Details -->
-            <section class="form-section">
-                <h2>Recipe Details</h2>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="prep_time">Prep Time (minutes)</label>
-                        <input 
-                            type="number" 
-                            id="prep_time" 
-                            name="prep_time"
-                            min="0"
-                            value="<%= formData.prep_time || '' %>"
-                            placeholder="15"
-                        >
-                    </div>
+
+        <div class="form-container">
+            <form action="/recipes" method="POST" class="recipe-form">
+                <!-- Basic Information -->
+                <section class="form-section">
+                    <h2>Basic Information</h2>
                     
                     <div class="form-group">
-                        <label for="cook_time">Cook Time (minutes)</label>
+                        <label for="title">Recipe Title *</label>
                         <input 
-                            type="number" 
-                            id="cook_time" 
-                            name="cook_time"
-                            min="0"
-                            value="<%= formData.cook_time || '' %>"
-                            placeholder="30"
+                            type="text" 
+                            id="title" 
+                            name="title" 
+                            required 
+                            value="<%= formData.title || '' %>"
+                            class="form-input"
                         >
                     </div>
-                </div>
-                
-                <div class="form-row">
+
                     <div class="form-group">
-                        <label for="servings">Servings</label>
+                        <label for="description">Description</label>
+                        <textarea 
+                            id="description" 
+                            name="description" 
+                            rows="3"
+                            class="form-input"
+                        ><%= formData.description || '' %></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="image_url">Image URL</label>
                         <input 
-                            type="number" 
-                            id="servings" 
-                            name="servings"
-                            min="1"
-                            value="<%= formData.servings || '' %>"
-                            placeholder="4"
+                            type="url" 
+                            id="image_url" 
+                            name="image_url" 
+                            value="<%= formData.image_url || '' %>"
+                            placeholder="https://example.com/image.jpg"
+                            class="form-input"
                         >
                     </div>
+                </section>
+
+                <!-- Recipe Details -->
+                <section class="form-section">
+                    <h2>Recipe Details</h2>
                     
-                    <div class="form-group">
-                        <label for="difficulty">Difficulty</label>
-                        <select id="difficulty" name="difficulty">
-                            <option value="">Select difficulty</option>
-                            <option value="easy" <%= formData.difficulty === 'easy' ? 'selected' : '' %>>Easy</option>
-                            <option value="medium" <%= formData.difficulty === 'medium' ? 'selected' : '' %>>Medium</option>
-                            <option value="hard" <%= formData.difficulty === 'hard' ? 'selected' : '' %>>Hard</option>
-                        </select>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="prep_time">Prep Time (minutes)</label>
+                            <input 
+                                type="number" 
+                                id="prep_time" 
+                                name="prep_time" 
+                                min="0"
+                                value="<%= formData.prep_time || '' %>"
+                                class="form-input"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cook_time">Cook Time (minutes)</label>
+                            <input 
+                                type="number" 
+                                id="cook_time" 
+                                name="cook_time" 
+                                min="0"
+                                value="<%= formData.cook_time || '' %>"
+                                class="form-input"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="servings">Servings</label>
+                            <input 
+                                type="number" 
+                                id="servings" 
+                                name="servings" 
+                                min="1"
+                                value="<%= formData.servings || '' %>"
+                                class="form-input"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="difficulty">Difficulty</label>
+                            <select id="difficulty" name="difficulty" class="form-input">
+                                <option value="">Select...</option>
+                                <option value="easy" <%= formData.difficulty === 'easy' ? 'selected' : '' %>>Easy</option>
+                                <option value="medium" <%= formData.difficulty === 'medium' ? 'selected' : '' %>>Medium</option>
+                                <option value="hard" <%= formData.difficulty === 'hard' ? 'selected' : '' %>>Hard</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
-            </section>
-            
-            <!-- Ingredients -->
-            <section class="form-section">
-                <h2>Ingredients</h2>
-                <div id="ingredients-list">
-                    <div class="ingredient-row">
-                        <input 
-                            type="text" 
-                            name="ingredient_quantity" 
-                            placeholder="2 cups"
-                            class="ingredient-quantity"
-                        >
-                        <input 
-                            type="text" 
-                            name="ingredient_name" 
-                            placeholder="all-purpose flour"
-                            class="ingredient-name"
-                        >
-                        <button type="button" class="btn-remove-ingredient" onclick="removeIngredient(this)">Remove</button>
+                </section>
+
+                <!-- Categories -->
+                <% if (categories && categories.length > 0) { %>
+                    <section class="form-section">
+                        <h2>Categories</h2>
+                        <p class="form-help">Select categories that best describe your recipe (optional)</p>
+                        
+                        <div class="checkbox-grid">
+                            <% categories.forEach(category => { %>
+                                <label class="checkbox-label">
+                                    <input 
+                                        type="checkbox" 
+                                        name="categories" 
+                                        value="<%= category.category_id %>"
+                                    >
+                                    <span><%= category.category_name %></span>
+                                </label>
+                            <% }) %>
+                        </div>
+                    </section>
+                <% } %>
+
+                <!-- Ingredients -->
+                <section class="form-section">
+                    <h2>Ingredients</h2>
+                    <div id="ingredients-container">
+                        <div class="ingredient-row">
+                            <input 
+                                type="text" 
+                                name="ingredient_quantity" 
+                                placeholder="Quantity (e.g., 2 cups)"
+                                class="form-input ingredient-quantity"
+                            >
+                            <input 
+                                type="text" 
+                                name="ingredient_name" 
+                                placeholder="Ingredient name"
+                                class="form-input ingredient-name"
+                            >
+                            <button type="button" class="btn btn-sm btn-danger" onclick="removeIngredient(this)">Remove</button>
+                        </div>
                     </div>
-                </div>
-                <button type="button" class="btn btn-secondary" onclick="addIngredient()">Add Ingredient</button>
-            </section>
-            
-            <!-- Instructions -->
-            <section class="form-section">
-                <h2>Instructions *</h2>
-                <div class="form-group">
+                    <button type="button" class="btn btn-secondary" onclick="addIngredient()">+ Add Ingredient</button>
+                </section>
+
+                <!-- Instructions -->
+                <section class="form-section">
+                    <h2>Instructions *</h2>
                     <textarea 
                         id="instructions" 
-                        name="instructions"
+                        name="instructions" 
                         rows="10"
                         required
-                        placeholder="1. Preheat oven to 350°F&#10;2. Mix dry ingredients...&#10;3. Add wet ingredients...&#10;etc."
+                        class="form-input"
+                        placeholder="Enter cooking instructions step by step..."
                     ><%= formData.instructions || '' %></textarea>
-                    <small class="form-hint">Write step-by-step instructions for your recipe</small>
+                </section>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <a href="/recipes" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-success">Create Recipe</button>
                 </div>
-            </section>
-            
-            <!-- Submit -->
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Create Recipe</button>
-                <a href="/recipes" class="btn">Cancel</a>
-            </div>
-        </form>
-    </div>
-</main>
+            </form>
+        </div>
+    </main>
 
-<script>
-function addIngredient() {
-    const ingredientsList = document.getElementById('ingredients-list');
-    const newIngredient = document.createElement('div');
-    newIngredient.className = 'ingredient-row';
-    newIngredient.innerHTML = `
-        <input 
-            type="text" 
-            name="ingredient_quantity" 
-            placeholder="1 cup"
-            class="ingredient-quantity"
-        >
-        <input 
-            type="text" 
-            name="ingredient_name" 
-            placeholder="sugar"
-            class="ingredient-name"
-        >
-        <button type="button" class="btn-remove-ingredient" onclick="removeIngredient(this)">Remove</button>
-    `;
-    ingredientsList.appendChild(newIngredient);
-}
+    <script>
+        function addIngredient() {
+            const container = document.getElementById('ingredients-container');
+            const newRow = document.createElement('div');
+            newRow.className = 'ingredient-row';
+            newRow.innerHTML = `
+                <input 
+                    type="text" 
+                    name="ingredient_quantity" 
+                    placeholder="Quantity (e.g., 2 cups)"
+                    class="form-input ingredient-quantity"
+                >
+                <input 
+                    type="text" 
+                    name="ingredient_name" 
+                    placeholder="Ingredient name"
+                    class="form-input ingredient-name"
+                >
+                <button type="button" class="btn btn-sm btn-danger" onclick="removeIngredient(this)">Remove</button>
+            `;
+            container.appendChild(newRow);
+        }
 
-function removeIngredient(button) {
-    const ingredientRow = button.parentElement;
-    ingredientRow.remove();
-}
-</script>
+        function removeIngredient(button) {
+            const container = document.getElementById('ingredients-container');
+            if (container.children.length > 1) {
+                button.parentElement.remove();
+            } else {
+                alert('You must have at least one ingredient field');
+            }
+        }
+    </script>
 
-<%- include('../partials/footer') %>
+    <%- include('../partials/footer') %>
+</body>
+</html>
